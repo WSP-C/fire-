@@ -94,19 +94,6 @@ from ultralytics.utils.torch_utils import (
     smart_inference_mode,
     time_sync,
 )
-# --- 在第 70 行左右粘贴这段代码 ---
-# class SimAM(nn.Module):
-#     def __init__(self, channels=None, e_lambda=1e-4):
-#         super(SimAM, self).__init__()
-#         self.activaton = nn.Sigmoid()
-#         self.e_lambda = e_lambda
-#
-#     def forward(self, x):
-#         b, c, h, w = x.size()
-#         n = w * h - 1
-#         x_minus_mu_square = (x - x.mean(dim=[2, 3], keepdim=True)).pow(2)
-#         y = x_minus_mu_square / (4 * (x_minus_mu_square.sum(dim=[2, 3], keepdim=True) / n + self.e_lambda)) + 0.5
-#         return x * self.activaton(y)
 
 class BaseModel(torch.nn.Module):
     """Base class for all YOLO models in the Ultralytics family.
@@ -1567,8 +1554,7 @@ def parse_model(d, ch, verbose=True):
             SCDown,
             C2fCIB,
             A2C2f,
-            EMA,
-#            SimAM,
+            # EMA,
         }
     )
     repeat_modules = frozenset(  # modules with 'repeat' arguments
