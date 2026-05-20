@@ -1,11 +1,9 @@
-# 1. 核心过滤：默认忽略 models 文件夹下的所有子文件夹
-# 先忽略 models 目录下的所有版本文件夹
-cfg/models/*/
+# 1. 全局封锁：不管在哪个目录下，只要是 models 里的子文件夹全部忽略
+**/models/*/
 
-# 2. 精准放行：只允许追踪 v8 相关的文件夹和文件
-# 允许追踪 models 目录下的 v8 文件夹
-!cfg/models/v8/
-!cfg/models/v8/**
+# 2. 强行放行：只允许追踪名字叫 v8 的文件夹
+!**/models/v8/
+!**/models/v8/**
 
 # 3. 隔离常见的大体积数据、权重与环境缓存（防止仓库爆炸）
 datasets/
@@ -15,3 +13,4 @@ datasets/
 *.rknn
 .idea/
 __pycache__/
+
