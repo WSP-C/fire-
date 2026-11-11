@@ -13,6 +13,7 @@ from .tasks import (
     yaml_model_load,
 )
 
+
 __all__ = (
     "BaseModel",
     "ClassificationModel",

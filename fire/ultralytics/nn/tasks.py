@@ -32,6 +32,7 @@ from ultralytics.nn.modules import (
     C2f,
     C2fAttn,
     C2fCIB,
+    C2fEMA,
     C2fPSA,
     C3Ghost,
     C3k2,
@@ -1535,6 +1536,7 @@ def parse_model(d, ch, verbose=True):
             C1,
             C2,
             C2f,
+            C2fEMA,
             C3k2,
             RepNCSPELAN4,
             ELAN1,
@@ -1561,6 +1563,7 @@ def parse_model(d, ch, verbose=True):
             C1,
             C2,
             C2f,
+            C2fEMA,
             C3k2,
             C2fAttn,
             C3,
@@ -1643,6 +1646,7 @@ def parse_model(d, ch, verbose=True):
             c2 = args[0]
             c1 = ch[f]
             args = [*args[1:]]
+
         else:
             c2 = ch[f]
 
