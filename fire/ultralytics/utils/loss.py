@@ -207,6 +207,13 @@ class v8DetectionLoss:
         self.no = m.nc + m.reg_max * 4
         self.reg_max = m.reg_max
         self.device = device
+        class_loss_weights = model.yaml.get("class_loss_weights")
+        if class_loss_weights is not None:
+            if len(class_loss_weights) != self.nc or any(weight <= 0 for weight in class_loss_weights):
+                raise ValueError(f"class_loss_weights must contain {self.nc} positive values")
+            self.class_loss_weights = torch.tensor(class_loss_weights, device=device).view(1, 1, self.nc)
+        else:
+            self.class_loss_weights = None
 
         self.use_dfl = m.reg_max > 1
 
@@ -281,7 +288,14 @@ class v8DetectionLoss:
 
         # Cls loss
         # loss[1] = self.varifocal_loss(pred_scores, target_scores, target_labels) / target_scores_sum  # VFL way
-        loss[1] = self.bce(pred_scores, target_scores.to(dtype)).sum() / target_scores_sum  # BCE
+        cls_loss = self.bce(pred_scores, target_scores.to(dtype))
+        if self.class_loss_weights is not None:
+            class_loss_weights = self.class_loss_weights.to(dtype)
+            cls_loss = cls_loss * class_loss_weights
+            cls_normalizer = max((target_scores * class_loss_weights).sum(), 1)
+        else:
+            cls_normalizer = target_scores_sum
+        loss[1] = cls_loss.sum() / cls_normalizer  # BCE
 
         # Bbox loss
         if fg_mask.sum():

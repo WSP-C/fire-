@@ -16,7 +16,6 @@ if __name__ == '__main__':
         batch=32,
         deterministic=False,
         imgsz=640,
-        patience=15,
         cache=True,
         project="runs/detect",
         name="train_baseline_yolov8n"

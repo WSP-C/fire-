@@ -21,8 +21,7 @@ if __name__ == "__main__":
         deterministic=True,
         seed=0,
         imgsz=640,
-        patience=15,
         cache=True,
         project="runs/detect",
-        name="train_ema_yolov8n_residual",
+        name="train_ema_yolov8n",
     )

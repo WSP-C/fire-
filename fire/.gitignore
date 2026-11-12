@@ -148,7 +148,6 @@ dmypy.json
 
 # datasets and projects (ignore /datasets dir at root only to allow for docs/en/datasets dir)
 /datasets
-runs/
 wandb/
 .DS_Store
 
@@ -198,3 +197,23 @@ calibration_*.npy
 *.heic
 *.ico
 *.raw
+
+Dataset*/
+github_key
+github_key.pub
+
+CubeMx/
+DataLoader_learn/
+Draw frames/
+Object Detection/
+yolov5-7.0/
+
+*.cache
+# 数据集
+datasets/
+dataset/
+Dataset/
+images/
+labels/
+DataLoader_learn/
+

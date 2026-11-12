@@ -128,6 +128,7 @@ __all__ = (
     "BottleneckCSP",
     "C2f",
     "C2fEMA",
+    "C2fEMACentered",
     "C2fAttn",
     "C2fCIB",
     "C2fPSA",
@@ -181,4 +182,4 @@ __all__ = (
     "YOLOESegment",
     "v10Detect",
 )
-from .ema import C2fEMA, EMA
+from .ema import C2fEMA, C2fEMACentered, EMA, EMACentered

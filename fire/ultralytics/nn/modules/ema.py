@@ -147,3 +147,46 @@ class C2fEMA(C2f):
 
     def forward_split(self, x):
         return self.ema(super().forward_split(x))
+
+
+class EMACentered(EMA):
+    """EMA with centered attention and an identity-initialized per-channel residual gate."""
+
+    def __init__(self, channels, factor=8):
+        super().__init__(channels, factor)
+        self.gamma = nn.Parameter(torch.zeros(1, channels, 1, 1))
+
+    def forward(self, x):
+        b, c, h, w = x.shape
+        group_x = x.reshape(b * self.groups, c // self.groups, h, w)
+        x_h = self.pool_h(group_x)
+        x_w = self.pool_w(group_x).permute(0, 1, 3, 2)
+        hw = self.conv1x1(torch.cat((x_h, x_w), dim=2))
+        x_h, x_w = torch.split(hw, (h, w), dim=2)
+
+        directional = self.gn(group_x * x_h.sigmoid() * x_w.permute(0, 1, 3, 2).sigmoid())
+        local = self.conv3x3(group_x)
+        directional_query = self.softmax(self.agp(directional).flatten(2).transpose(1, 2))
+        local_query = self.softmax(self.agp(local).flatten(2).transpose(1, 2))
+        directional_values = local.flatten(2)
+        local_values = directional.flatten(2)
+        attention = torch.matmul(directional_query, directional_values) + torch.matmul(local_query, local_values)
+        attention = attention.reshape(b * self.groups, 1, h, w).sigmoid()
+
+        # Centering around zero avoids the amplification-only bias of sigmoid gating.
+        delta = (group_x * (2.0 * attention - 1.0)).reshape(b, c, h, w)
+        return x + self.gamma * delta
+
+
+class C2fEMACentered(C2f):
+    """C2f followed by centered residual EMA for context-rich feature levels."""
+
+    def __init__(self, c1, c2, n=1, shortcut=False, g=1, e=0.5, factor=8):
+        super().__init__(c1, c2, n, shortcut, g, e)
+        self.ema = EMACentered(c2, factor)
+
+    def forward(self, x):
+        return self.ema(super().forward(x))
+
+    def forward_split(self, x):
+        return self.ema(super().forward_split(x))
